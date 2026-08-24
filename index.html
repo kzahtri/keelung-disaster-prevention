@@ -5,6 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>基隆市防災士培訓報名平台</title>
+  
+  <!-- External Libraries -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -12,7 +14,7 @@
         extend: {
           colors: {
             brand: {
-              50: '#f0f9ff', 100: '#e0f2fe', 500: '#0284c7',
+              50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 500: '#0284c7',
               600: '#0369a1', 700: '#075985', 800: '#0c4a6e', 900: '#0a3750'
             }
           }
@@ -23,30 +25,10 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
 
-<script>
-  /** External Google Apps Script Web App URL */
-  const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7k3DQmliGW-Ai-kXIUw_-c4dkLLQwTDkvccyBWnIP4djdMuP9Ssakn3L4GAfAkW0K/exec";
+  <!-- Global GAS Helper Script -->
+  <script>
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7k3DQmliGW-Ai-kXIUw_-c4dkLLQwTDkvccyBWnIP4djdMuP9Ssakn3L4GAfAkW0K/exec";
 
-  /** Async Promise Wrapper using fetch API */
-  async function gsRun(fnName, ...args) {
-    try {
-      const response = await fetch(GAS_WEB_APP_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: fnName, args: args })
-      });
-      
-      const data = await response.json();
-      if (data.status === 'error' || data.error) {
-        throw new Error(data.error || 'Server error');
-      }
-      return data.result !== undefined ? data.result : data;
-    } catch (err) {
-      throw new Error(err.message || '無法連線至 Google Apps Script 後端');
-    }
-  }
-</script>
-    /** Async Promise Wrapper using fetch API */
     async function gsRun(fnName, ...args) {
       try {
         const response = await fetch(GAS_WEB_APP_URL, {
@@ -64,6 +46,8 @@
         throw new Error(err.message || '無法連線至 Google Apps Script 後端');
       }
     }
+  </script>
+
   <style>
     [v-cloak] { display: none !important; }
     .glass-effect { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); }
@@ -73,6 +57,7 @@
 
   <div id="app" v-cloak class="flex flex-col min-h-screen">
 
+    <!-- Header Navigation -->
     <header class="sticky top-0 z-40 glass-effect border-b border-slate-200 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
@@ -116,6 +101,7 @@
       </div>
     </header>
 
+    <!-- Top Sub-Bar -->
     <div class="bg-brand-900 text-slate-200 text-xs py-2 px-4">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
         <div class="flex items-center space-x-2">
@@ -126,6 +112,7 @@
       </div>
     </div>
 
+    <!-- Toast Notification -->
     <div v-if="toast.message" class="fixed top-20 right-4 z-50 max-w-sm">
       <div :class="toast.type === 'error' ? 'bg-red-600' : 'bg-emerald-600'" class="text-white text-sm px-4 py-3 rounded-lg shadow-lg flex items-start">
         <i :data-lucide="toast.type === 'error' ? 'alert-circle' : 'check-circle'" class="w-4 h-4 mr-2 mt-0.5 shrink-0"></i>
@@ -135,6 +122,7 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+      <!-- SECTION: Courses List -->
       <section v-if="currentView === 'courses'">
         <div class="mb-8 bg-gradient-to-r from-brand-800 to-brand-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
           <div class="relative z-10 max-w-2xl">
@@ -191,6 +179,7 @@
         </div>
       </section>
 
+      <!-- SECTION: Registration Form -->
       <section v-if="currentView === 'register'" class="max-w-3xl mx-auto">
         <button @click="goTo('courses')" class="mb-4 inline-flex items-center text-sm font-medium text-slate-600 hover:text-brand-600">
           <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> 返回場次列表
@@ -309,8 +298,9 @@
               </div>
             </div>
 
+            <!-- Photo Upload Area -->
             <div class="border-t border-slate-200 pt-4">
-              <label class="block text-sm font-medium text-slate-700 mb-1">證書大頭照 (支援線上 2 吋裁切，最大 5MB)</label>
+              <label class="block text-sm font-medium text-slate-700 mb-1">證書大頭照 (支援線上裁切，最大 5MB)</label>
               <div v-if="!form.croppedPhoto" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-lg hover:border-brand-500 transition">
                 <div class="space-y-1 text-center">
                   <i data-lucide="crop" class="mx-auto h-10 w-10 text-slate-400"></i>
@@ -321,7 +311,7 @@
                     </label>
                     <p class="pl-1">上傳照片並開啟裁切工具</p>
                   </div>
-                  <p class="text-xs text-slate-500">建議清晰脫帽照，可進行拖曳、縮放與旋轉</p>
+                  <p class="text-xs text-slate-500">建議清晰脫帽照，可進行拖曳與縮放</p>
                 </div>
               </div>
               <div v-else class="mt-2 flex items-center space-x-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
@@ -346,6 +336,7 @@
         </div>
       </section>
 
+      <!-- SECTION: Status Tracking & Resubmission -->
       <section v-if="currentView === 'track'" class="max-w-3xl mx-auto space-y-6">
         <div class="bg-white rounded-xl shadow-md border border-slate-200 p-6">
           <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center"><i data-lucide="search" class="w-5 h-5 mr-2 text-brand-600"></i>學員進度查詢與課後補件</h2>
@@ -417,6 +408,7 @@
         </div>
       </section>
 
+      <!-- SECTION: Admin Panel -->
       <section v-if="currentView === 'admin' && !adminToken" class="max-w-sm mx-auto">
         <div class="bg-white rounded-xl shadow-md border border-slate-200 p-6">
           <h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center"><i data-lucide="lock" class="w-5 h-5 mr-2 text-brand-600"></i>消防局後台管理登入</h2>
@@ -433,16 +425,12 @@
       </section>
 
       <section v-if="currentView === 'admin' && adminToken" class="space-y-6">
-
         <div class="flex justify-between items-center">
           <p class="text-sm text-slate-500">登入身分：<strong class="text-slate-800">{{ adminDisplayName }}</strong></p>
           <button @click="doAdminLogout" class="text-xs text-slate-500 hover:text-red-600 flex items-center"><i data-lucide="log-out" class="w-3.5 h-3.5 mr-1"></i>登出</button>
         </div>
-            <td class="p-3 text-right space-x-1">
-  <button @click="changeStatus(app, '已錄取')" class="px-2 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded transition">錄取</button>
-  <button @click="changeStatus(app, '待補件')" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded transition">補件</button>
-  <button @click="changeStatus(app, '證書待領取')" class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded transition">發證</button>
-            </td>
+
+        <!-- Dashboard Stats -->
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
             <div><p class="text-xs text-slate-500 font-medium">總報名人數</p><h4 class="text-2xl font-bold text-slate-900 mt-1">{{ stats.total }}</h4></div>
@@ -462,619 +450,424 @@
           </div>
         </div>
 
+        <!-- Course Management -->
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
           <div class="flex justify-between items-center border-b pb-2">
             <h3 class="text-sm font-bold text-slate-900">場次管理與編輯</h3>
             <button @click="openCourseModal()" class="text-xs bg-brand-600 text-white px-3 py-1 rounded hover:bg-brand-700">+ 新增場次</button>
           </div>
 
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="bg-slate-100 border-b">
-                <th class="p-2">代碼 / 名稱</th>
-                <th class="p-2">日期 / 地點</th>
-                <th class="p-2">名額</th>
-                <th class="p-2">狀態</th>
-                <th class="p-2 text-right">操作</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y">
-              <tr v-for="c in adminCourseCodes" :key="c.id" class="hover:bg-slate-50">
-                <td class="p-2"><strong>{{ c.code }}</strong><br>{{ c.title }}</td>
-                <td class="p-2">{{ c.dateText }}<br><span class="text-slate-400">{{ c.location }}</span></td>
-                <td class="p-2">{{ c.capacity }}</td>
-                <td class="p-2">{{ c.status }}</td>
-                <td class="p-2 text-right space-x-1">
-                  <button @click="openCourseModal(c)" class="px-2 py-1 bg-amber-100 text-amber-800 rounded">編輯</button>
-                  <button @click="deleteCourseItem(c.id)" class="px-2 py-1 bg-red-100 text-red-700 rounded">刪除</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <!-- Modal Form -->
-          <div v-if="showCourseModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-            <div class="bg-white rounded-lg p-6 max-w-md w-full space-y-3 text-xs">
-              <h3 class="text-sm font-bold">{{ isEditing ? '編輯場次' : '新增場次' }}</h3>
-              <input v-model="courseForm.code" placeholder="場次代碼 (KL-115-01)" class="w-full border p-2 rounded">
-              <input v-model="courseForm.title" placeholder="場次名稱" class="w-full border p-2 rounded">
-              <input v-model="courseForm.dateText" placeholder="日期說明" class="w-full border p-2 rounded">
-              <input v-model="courseForm.location" placeholder="地點" class="w-full border p-2 rounded">
-              <input v-model.number="courseForm.capacity" type="number" placeholder="名額" class="w-full border p-2 rounded">
-              <input v-model="courseForm.organizer" placeholder="協辦單位" class="w-full border p-2 rounded">
-              <input v-model="courseForm.deadline" placeholder="截止日期" class="w-full border p-2 rounded">
-              <select v-model="courseForm.status" class="w-full border p-2 rounded">
-                <option value="開放報名">開放報名</option>
-                <option value="名額已滿">名額已滿</option>
-                <option value="已截止">已截止</option>
-              </select>
-              <div class="flex justify-end space-x-2 pt-2">
-                <button type="button" @click="showCourseModal = false" class="px-3 py-1.5 border rounded">取消</button>
-                <button type="button" @click="saveCourseForm" class="px-3 py-1.5 bg-brand-600 text-white rounded">儲存</button>
-              </div>
-            </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-100 border-b">
+                  <th class="p-2">代碼 / 名稱</th>
+                  <th class="p-2">日期 / 地點</th>
+                  <th class="p-2">名額</th>
+                  <th class="p-2">狀態</th>
+                  <th class="p-2 text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y">
+                <tr v-for="c in adminCourseCodes" :key="c.id" class="hover:bg-slate-50">
+                  <td class="p-2"><strong>{{ c.code }}</strong><br>{{ c.title }}</td>
+                  <td class="p-2">{{ c.dateText || c.date }}<br><span class="text-slate-400">{{ c.location }}</span></td>
+                  <td class="p-2">{{ c.capacity }}</td>
+                  <td class="p-2">{{ c.status }}</td>
+                  <td class="p-2 text-right space-x-1">
+                    <button @click="openCourseModal(c)" class="px-2 py-1 bg-amber-100 text-amber-800 rounded">編輯</button>
+                    <button @click="deleteCourseItem(c.id)" class="px-2 py-1 bg-red-100 text-red-700 rounded">刪除</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h3 class="text-lg font-bold text-slate-900">防災士培訓學員全程審核與管理</h3>
-              <p class="text-xs text-slate-500 mt-0.5">消防局資格審核、慈濟協力催收補件與消防署造冊轉出</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-2">
-              <button @click="batchApprove" :disabled="selectedIds.length === 0" class="px-3 py-1.5 bg-brand-600 disabled:opacity-50 hover:bg-brand-700 text-white text-xs font-medium rounded transition flex items-center">
-                <i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i> 批次核准錄取 ({{ selectedIds.length }})
-              </button>
-              <button @click="exportNfaCsv" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-medium rounded transition flex items-center">
-                <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 mr-1"></i> 匯出消防署造冊格式 (.csv)
-              </button>
-            </div>
-          </div>
-
-          <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex flex-wrap gap-3 items-center text-xs">
-            <span class="font-bold text-slate-700">狀態篩選：</span>
-            <select v-model="filterStatus" @change="loadApplicants" class="border border-slate-300 rounded px-2 py-1 bg-white">
-              <option value="ALL">全部狀態</option>
-              <option v-for="s in statusList" :key="s" :value="s">{{ s }}</option>
-            </select>
-            <select v-model="filterCourse" @change="loadApplicants" class="border border-slate-300 rounded px-2 py-1 bg-white">
-              <option value="ALL">全部場次</option>
-              <option v-for="c in adminCourseCodes" :key="c.code" :value="c.code">{{ c.code }} - {{ c.title }}</option>
-            </select>
-            <input type="text" v-model="searchKeyword" @keyup.enter="loadApplicants" placeholder="搜尋姓名/身分證/電話 (按 Enter)" class="border border-slate-300 rounded px-2 py-1 bg-white ml-auto w-56">
-          </div>
-
+        <!-- Student Applications Management -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+          <h3 class="text-sm font-bold text-slate-900 border-b pb-2">報名學員審核與狀態變更</h3>
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-600">
-              <thead class="bg-slate-100 text-slate-700 font-bold uppercase tracking-wider border-b border-slate-200">
-                <tr>
-                  <th class="p-3 w-8 text-center"><input type="checkbox" @change="toggleSelectAll" :checked="isAllSelected" class="rounded border-slate-300 text-brand-600"></th>
-                  <th class="p-3">姓名 / 身分證號</th>
-                  <th class="p-3">報名場次</th>
-                  <th class="p-3">聯絡電話 / Email</th>
-                  <th class="p-3">大頭照狀態</th>
-                  <th class="p-3">審核狀態</th>
-                  <th class="p-3 text-right">管理操作</th>
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-100 border-b">
+                  <th class="p-2">編號</th>
+                  <th class="p-2">姓名 / 身分證</th>
+                  <th class="p-2">電話</th>
+                  <th class="p-2">報名場次</th>
+                  <th class="p-2">目前狀態</th>
+                  <th class="p-2 text-right">操作</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200">
-                <tr v-for="app in applicants" :key="app.id" class="hover:bg-slate-50 transition">
-                  <td class="p-3 text-center"><input type="checkbox" :value="app.id" v-model="selectedIds" class="rounded border-slate-300 text-brand-600"></td>
-                  <td class="p-3"><div class="font-bold text-slate-900">{{ app.name }}</div><div class="text-slate-400 font-mono">{{ app.maskedId }}</div></td>
-                  <td class="p-3 font-medium text-slate-700">{{ app.courseCode }}</td>
-                  <td class="p-3"><div>{{ app.phone }}</div><div class="text-slate-400">{{ app.email }}</div></td>
-                  <td class="p-3">
-                    <span v-if="app.hasPhoto" class="inline-flex items-center text-emerald-600 font-semibold"><i data-lucide="check-circle" class="w-3.5 h-3.5 mr-1"></i> 已上傳</span>
-                    <span v-else class="inline-flex items-center text-red-500 font-semibold"><i data-lucide="x-circle" class="w-3.5 h-3.5 mr-1"></i> 未上傳</span>
-                  </td>
-                  <td class="p-3"><span :class="statusBadgeClass(app.status)" class="px-2 py-0.5 rounded-md font-semibold border">{{ app.status }}</span></td>
-                  <td class="p-3 text-right space-x-1">
+              <tbody class="divide-y">
+                <tr v-for="app in applicantList" :key="app.id" class="hover:bg-slate-50">
+                  <td class="p-2 font-mono text-slate-400">{{ app.trackingNo }}</td>
+                  <td class="p-2"><strong>{{ app.name }}</strong><br><span class="text-slate-400">{{ app.nationalId }}</span></td>
+                  <td class="p-2">{{ app.phone }}</td>
+                  <td class="p-2">{{ app.courseTitle }}</td>
+                  <td class="p-2"><span :class="statusBadgeClass(app.status)" class="px-2 py-0.5 rounded text-[10px]">{{ app.status }}</span></td>
+                  <td class="p-2 text-right space-x-1">
                     <button @click="changeStatus(app, '已錄取')" class="px-2 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded transition">錄取</button>
                     <button @click="changeStatus(app, '待補件')" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded transition">補件</button>
                     <button @click="changeStatus(app, '證書待領取')" class="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded transition">發證</button>
                   </td>
                 </tr>
-                <tr v-if="!loading.applicants && applicants.length === 0"><td colspan="7" class="p-8 text-center text-slate-400">目前無符合條件的學員報名資料</td></tr>
-                <tr v-if="loading.applicants"><td colspan="7" class="p-8 text-center text-slate-400"><i data-lucide="loader-2" class="w-5 h-5 animate-spin inline-block mr-2"></i>資料讀取中...</td></tr>
               </tbody>
             </table>
           </div>
-          <div class="p-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-500 flex justify-between items-center">
-            <span>顯示 {{ applicants.length }} 筆資料</span>
-            <span>資料儲存於獨立 Google 試算表，符合公共程式開放標準</span>
-          </div>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-xs space-y-2">
-          <h4 class="font-bold text-slate-700 flex items-center"><i data-lucide="shield" class="w-4 h-4 mr-1.5 text-brand-600"></i>系統資安與操作日誌紀錄 (Audit Trail)</h4>
-          <ul class="space-y-1 text-slate-500 font-mono max-h-64 overflow-y-auto">
-            <li v-for="(log, idx) in auditLogs" :key="idx" class="border-b border-slate-100 pb-1">[{{ log.timestamp }}] [{{ log.operator }}] {{ log.actionText }}</li>
-          </ul>
         </div>
       </section>
+
     </main>
 
-    <div v-if="showCropper" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col">
-        <div class="px-5 py-4 border-b border-slate-200 flex justify-between items-center">
-          <h3 class="text-base font-bold text-slate-900 flex items-center"><i data-lucide="crop" class="w-4 h-4 mr-2 text-brand-600"></i> 大頭照標準 2 吋比例裁切</h3>
-          <button @click="closeCropper" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <!-- Modal: Image Crop Window -->
+    <div v-if="cropperModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+        <h3 class="text-lg font-bold text-slate-900">大頭照預覽與裁切</h3>
+        <div class="w-full h-64 bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center border">
+          <img :src="rawImageSrc" class="max-h-full max-w-full object-contain">
         </div>
-        <div class="p-4 bg-slate-900 flex justify-center items-center overflow-hidden relative" style="height: 320px;">
-          <canvas ref="cropperCanvas" @mousedown="startDrag" @mousemove="drag" @mouseup="stopDrag" @mouseleave="stopDrag" @wheel.prevent="handleWheel" class="cursor-grab active:cursor-grabbing border border-white/20"></canvas>
-          <div class="absolute inset-0 pointer-events-none border-2 border-brand-500/50 flex items-center justify-center">
-            <div class="border-2 border-dashed border-white shadow-2xl rounded-sm" style="width: 200px; height: 260px;"></div>
-          </div>
-        </div>
-        <div class="p-4 bg-slate-50 border-t border-slate-200 space-y-3">
-          <div class="flex items-center space-x-3 text-xs text-slate-600">
-            <i data-lucide="zoom-in" class="w-4 h-4 text-slate-400"></i><span class="w-12">縮放:</span>
-            <input type="range" v-model.number="zoom" min="0.5" max="3" step="0.05" @input="drawCanvas" class="w-full accent-brand-600">
-          </div>
-          <div class="flex items-center space-x-3 text-xs text-slate-600">
-            <i data-lucide="rotate-cw" class="w-4 h-4 text-slate-400"></i><span class="w-12">旋轉:</span>
-            <input type="range" v-model.number="rotation" min="0" max="360" step="90" @input="drawCanvas" class="w-full accent-brand-600">
-          </div>
-          <p class="text-xs text-slate-400 text-center">按住滑鼠拖曳可調整相片位置，使用滑桿調整縮放與旋轉</p>
-        </div>
-        <div class="px-5 py-3 border-t border-slate-200 flex justify-end space-x-2 bg-white">
-          <button @click="closeCropper" class="px-4 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-50">取消</button>
-          <button @click="confirmCrop" class="px-5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-medium shadow-sm flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 mr-1"></i> 完成裁切</button>
+        <div class="flex justify-end space-x-2">
+          <button @click="cropperModalOpen = false" class="px-4 py-2 text-sm border rounded-lg hover:bg-slate-50">取消</button>
+          <button @click="confirmCrop" class="px-4 py-2 text-sm bg-brand-600 text-white rounded-lg hover:bg-brand-700">完成裁切</button>
         </div>
       </div>
     </div>
 
-    <footer class="bg-slate-900 text-slate-400 text-xs py-8 border-t border-slate-800 mt-auto">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+    <!-- Modal: Course Edit Window -->
+    <div v-if="courseModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+        <h3 class="text-lg font-bold text-slate-900">{{ courseForm.id ? '編輯場次' : '新增場次' }}</h3>
+        <div class="space-y-3 text-xs">
           <div>
-            <p class="font-bold text-slate-200">115年數位發展部全國公民科技試驗場域推廣案</p>
-            <p class="mt-1">基隆市防災士培訓報名平台 - 一站式開源公共程式服務</p>
+            <label class="block font-medium mb-1">場次代碼</label>
+            <input v-model="courseForm.code" class="w-full p-2 border rounded" placeholder="例: KL115-01">
           </div>
-          <div class="text-right"><p>主辦單位：基隆市政府消防局</p><p>協辦單位：慈濟基金會慈發處災防組</p></div>
+          <div>
+            <label class="block font-medium mb-1">課程名稱</label>
+            <input v-model="courseForm.title" class="w-full p-2 border rounded" placeholder="例: 基隆市115年第一期防災士培訓">
+          </div>
+          <div>
+            <label class="block font-medium mb-1">日期</label>
+            <input v-model="courseForm.date" class="w-full p-2 border rounded" placeholder="2026/05/10 - 2026/05/11">
+          </div>
+          <div>
+            <label class="block font-medium mb-1">地點</label>
+            <input v-model="courseForm.location" class="w-full p-2 border rounded" placeholder="基隆市消防局">
+          </div>
+          <div>
+            <label class="block font-medium mb-1">名額限制</label>
+            <input type="number" v-model="courseForm.capacity" class="w-full p-2 border rounded">
+          </div>
         </div>
-        <div class="border-t border-slate-800 pt-4 flex flex-col sm:flex-row justify-between text-slate-500">
-          <p>© 2026 Open Source Public Code Initiative. Licensed under MIT / Apache 2.0.</p>
-          <p class="mt-2 sm:mt-0">後端：Google Apps Script + Google Sheets／Drive</p>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button @click="courseModalOpen = false" class="px-4 py-2 text-xs border rounded hover:bg-slate-50">取消</button>
+          <button @click="saveCourse" class="px-4 py-2 text-xs bg-brand-600 text-white rounded hover:bg-brand-700">儲存</button>
         </div>
       </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 text-slate-400 text-xs py-6 mt-auto">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+        <p>© 2026 基隆市政府消防局 版權所有</p>
+        <p>國家防災專案數位推動計畫平台</p>
+      </div>
     </footer>
+
   </div>
 
+  <!-- Vue 3 Application Integration -->
   <script>
     const { createApp, ref, computed, onMounted, nextTick } = Vue;
-
-    /** GAS Async Promise Wrapper */
-    function gsRun(fnName, ...args) {
-      return new Promise((resolve, reject) => {
-        if (typeof google === 'undefined' || !google.script || !google.script.run) {
-          reject(new Error('未處於 Google Apps Script 環境中！'));
-          return;
-        }
-        google.script.run
-          .withSuccessHandler(resolve)
-          .withFailureHandler(err => reject(new Error(err && err.message ? err.message : String(err))))
-          [fnName](...args);
-      });
-    }
 
     createApp({
       setup() {
         const currentView = ref('courses');
         const mobileMenuOpen = ref(false);
+        const roleName = ref('一般學員');
+        
+        const toast = ref({ message: '', type: 'info' });
+        const showToast = (msg, type = 'info') => {
+          toast.value = { message: msg, type };
+          setTimeout(() => { toast.value.message = ''; }, 3500);
+        };
+
+        const loading = ref({ courses: false });
         const submitting = ref(false);
-        const submittingPhoto = ref(false);
         const tracking = ref(false);
-        const searched = ref(false);
-        const idValidationError = ref('');
-        const toast = ref({ message: '', type: 'success' });
-        const loading = ref({ courses: false, applicants: false });
+        const submittingPhoto = ref(false);
 
-        const cities = [
-          '基隆市', '臺北市', '新北市', '桃園市', '新竹市', '新竹縣', '苗栗縣',
-          '臺中市', '彰化縣', '南投縣', '雲林縣', '嘉義市', '嘉義縣',
-          '臺南市', '高雄市', '屏東縣', '宜蘭縣', '花蓮縣', '臺東縣',
-          '澎湖縣', '金門縣', '連江縣'
-        ];
-        const districts = ['仁愛區', '信義區', '中正區', '中山區', '安樂區', '七堵區', '暖暖區', '外縣市'];
-        const categories = ['一般民眾', '防災韌性社區居民', '基隆市政府/區公所人員', '志工/民間團體'];
-        const educationLevels = ['研究所(含)以上', '大學(專)', '高中(職)', '國中以下'];
-        const statusList = ['待審核', '已錄取', '待補件', '證書待領取', '已領證'];
-        const steps = ['報名送出', '資格審核', '課後補件', '證書造冊', '領證發放'];
-        const currentYear = new Date().getFullYear();
-        const birthYears = Array.from({ length: currentYear - 1940 - 11 }, (_, i) => currentYear - 12 - i);
-
-        function showToast(message, type = 'success') {
-          toast.value = { message, type };
-          setTimeout(() => { toast.value = { message: '', type: 'success' }; }, 4000);
-        }
-
-        function refreshIcons() {
-          nextTick(() => { if (window.lucide) window.lucide.createIcons(); });
-        }
-
-        // ---------- Courses ----------
+        // Course Data
         const courses = ref([]);
         const selectedCourse = ref(null);
 
-        async function loadCourses() {
-          loading.value.courses = true;
-          try {
-            courses.value = await gsRun('getCourses');
-          } catch (e) {
-            showToast(e.message, 'error');
-          } finally {
-            loading.value.courses = false;
-            refreshIcons();
-          }
-        }
+        // Form Select Options
+        const birthYears = Array.from({ length: 80 }, (_, i) => 2026 - i);
+        const birthDays = Array.from({ length: 31 }, (_, i) => i + 1);
+        const cities = ['基隆市', '臺北市', '新北市', '桃園市', '宜蘭縣', '其他'];
+        const districts = ['仁愛區', '信義區', '中正區', '中山區', '安樂區', '暖暖區', '七堵區', '外縣市'];
+        const categories = ['一般民眾', '防災士志工', '公務人員', '學生', '社企/NPO'];
+        const educationLevels = ['高中職以下', '專科', '大學', '碩士', '博士'];
 
-        function startRegistration(course) {
-          selectedCourse.value = course;
-          currentView.value = 'register';
-          refreshIcons();
-        }
-
-        // ---------- Registration Form ----------
-        const emptyForm = () => ({
-          agreeTerms: false, name: '', nationalId: '', gender: '', birthYear: '', birthMonth: '', birthDay: '',
-          phone: '', email: '', city: '', district: '', address: '', category: '', education: '',
-          organization: '', jobTitle: '', emergencyContact: '', emergencyPhone: '', croppedPhoto: null
-        });
-        const form = ref(emptyForm());
-
-        const birthDays = computed(() => {
-          const y = Number(form.value.birthYear);
-          const m = Number(form.value.birthMonth);
-          if (!y || !m) return Array.from({ length: 31 }, (_, i) => i + 1);
-          const days = new Date(y, m, 0).getDate();
-          if (form.value.birthDay && Number(form.value.birthDay) > days) form.value.birthDay = '';
-          return Array.from({ length: days }, (_, i) => i + 1);
+        const form = ref({
+          agreeTerms: false,
+          name: '',
+          nationalId: '',
+          gender: '',
+          birthYear: '', birthMonth: '', birthDay: '',
+          phone: '', email: '',
+          city: '基隆市', district: '', address: '',
+          category: '', education: '',
+          organization: '', jobTitle: '',
+          emergencyContact: '', emergencyPhone: '',
+          croppedPhoto: null
         });
 
+        const idValidationError = ref('');
         const validateNationalId = () => {
           const id = form.value.nationalId.trim().toUpperCase();
-          if (!id) { idValidationError.value = ''; return; }
           const regex = /^[A-Z][1289]\d{8}$/;
-          if (!regex.test(id)) { idValidationError.value = '身分證字號或居留證號格式不正確'; return; }
-          const letters = 'ABCDEFGHJKLMNPQRSTUVXYWZIO';
-          const code = letters.indexOf(id[0]) + 10;
-          const multiply = [1, 9, 8, 7, 6, 5, 4, 3, 2, 1, 1];
-          const fullId = Math.floor(code / 10) + '' + (code % 10) + id.substring(1);
-          let sum = 0;
-          for (let i = 0; i < fullId.length; i++) sum += parseInt(fullId[i]) * multiply[i];
-          idValidationError.value = (sum % 10 !== 0) ? '無效的身分證字號，請重新核對' : '';
+          if (id && !regex.test(id)) {
+            idValidationError.value = '身分證 / 居留證號格式不正確';
+          } else {
+            idValidationError.value = '';
+          }
         };
 
-        async function submitRegistration() {
-          if (idValidationError.value) return;
-          submitting.value = true;
-          try {
-            const birthday = form.value.birthYear && form.value.birthMonth && form.value.birthDay
-              ? form.value.birthYear + '-' + String(form.value.birthMonth).padStart(2, '0') + '-' + String(form.value.birthDay).padStart(2, '0')
-              : '';
-            const result = await gsRun('submitRegistration', {
-              courseId: selectedCourse.value.id,
-              name: form.value.name,
-              nationalId: form.value.nationalId,
-              gender: form.value.gender,
-              birthday: birthday,
-              phone: form.value.phone,
-              email: form.value.email,
-              city: form.value.city,
-              district: form.value.district,
-              address: form.value.address,
-              category: form.value.category,
-              education: form.value.education,
-              organization: form.value.organization,
-              jobTitle: form.value.jobTitle,
-              emergencyContact: form.value.emergencyContact,
-              emergencyPhone: form.value.emergencyPhone,
-              agreeTerms: form.value.agreeTerms,
-              photoBase64: form.value.croppedPhoto
-            });
-            trackQuery.value.nationalId = form.value.nationalId;
-            trackQuery.value.phone = form.value.phone;
-            alert('【報名成功】\n專屬查詢號為：' + result.trackingNo + (result.isFull ? '\n（此場次名額已滿，您已進入候補名單）' : ''));
-            form.value = emptyForm();
-            currentView.value = 'track';
-            await searchApplication();
-            await loadCourses();
-          } catch (e) {
-            showToast(e.message, 'error');
-          } finally {
-            submitting.value = false;
+        // Cropper Logic
+        const cropperModalOpen = ref(false);
+        const rawImageSrc = ref('');
+        const openCropper = (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+              showToast('檔案大小不能超過 5MB', 'error');
+              return;
+            }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              rawImageSrc.value = event.target.result;
+              cropperModalOpen.value = true;
+            };
+            reader.readAsDataURL(file);
           }
-        }
+        };
+        const confirmCrop = () => {
+          if (currentView.value === 'track') {
+            resubmitCroppedPhoto.value = rawImageSrc.value;
+          } else {
+            form.value.croppedPhoto = rawImageSrc.value;
+          }
+          cropperModalOpen.value = false;
+          showToast('照片處理完成');
+        };
 
-        // ---------- Tracking ----------
+        // Track Progress Logic
         const trackQuery = ref({ nationalId: '', phone: '' });
         const searchResult = ref(null);
+        const searched = ref(false);
         const resubmitCroppedPhoto = ref(null);
 
-        async function searchApplication() {
-          tracking.value = true;
-          try {
-            searchResult.value = await gsRun('searchApplication', trackQuery.value.nationalId, trackQuery.value.phone);
-            searched.value = true;
-          } catch (e) {
-            showToast(e.message, 'error');
-          } finally {
-            tracking.value = false;
-            refreshIcons();
-          }
-        }
-
-        async function submitTrackPhoto() {
-          submittingPhoto.value = true;
-          try {
-            const result = await gsRun('submitTrackPhoto', trackQuery.value.nationalId, trackQuery.value.phone, resubmitCroppedPhoto.value);
-            searchResult.value.status = result.status;
-            searchResult.value.hasPhoto = true;
-            resubmitCroppedPhoto.value = null;
-            showToast('大頭照補件上傳成功！');
-          } catch (e) {
-            showToast(e.message, 'error');
-          } finally {
-            submittingPhoto.value = false;
-          }
-        }
-
+        const steps = ['報名成功', '資格審核', '培訓修業', '證書發放'];
         const stepIndex = computed(() => {
           if (!searchResult.value) return 0;
-          return { '待審核': 0, '已錄取': 1, '待補件': 2, '證書待領取': 3, '已領證': 4 }[searchResult.value.status] ?? 0;
+          switch (searchResult.value.status) {
+            case '已報名': case '審核中': return 0;
+            case '已錄取': case '待補件': return 1;
+            case '完訓': return 2;
+            case '證書待領取': case '已領證': return 3;
+            default: return 0;
+          }
         });
-        const progressWidth = computed(() => (stepIndex.value / (steps.length - 1)) * 100 + '%');
+        const progressWidth = computed(() => `${(stepIndex.value / (steps.length - 1)) * 100}%`);
 
-        // ---------- Admin Auth ----------
-        const adminToken = ref(sessionStorage.getItem('kl_admin_token') || '');
-        const adminDisplayName = ref(sessionStorage.getItem('kl_admin_name') || '');
+        // Admin Logic
+        const adminToken = ref(localStorage.getItem('admin_token') || '');
+        const adminDisplayName = ref(localStorage.getItem('admin_name') || '消防局專案小組');
         const loginForm = ref({ username: '', password: '' });
         const loggingIn = ref(false);
         const loginError = ref('');
 
-        async function doAdminLogin() {
+        const stats = ref({ total: 0, pendingReview: 0, pendingDocs: 0, certified: 0 });
+        const adminCourseCodes = ref([]);
+        const applicantList = ref([]);
+        const courseModalOpen = ref(false);
+        const courseForm = ref({ id: '', code: '', title: '', date: '', location: '', capacity: 40 });
+
+        // Methods
+        const goTo = (view) => {
+          currentView.value = view;
+          if (view === 'courses') fetchCourses();
+          if (view === 'admin' && adminToken.value) fetchAdminData();
+          nextTick(() => lucide.createIcons());
+        };
+
+        const navBtnClass = (view) => {
+          return currentView.value === view
+            ? 'px-3 py-2 rounded-md text-sm font-medium text-brand-600 bg-brand-50'
+            : 'px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100';
+        };
+
+        const statusBadgeClass = (status) => {
+          switch (status) {
+            case '已錄取': return 'bg-brand-50 text-brand-700 border-brand-200';
+            case '待補件': return 'bg-amber-50 text-amber-700 border-amber-200';
+            case '證書待領取': case '已領證': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+            default: return 'bg-slate-100 text-slate-700 border-slate-200';
+          }
+        };
+
+        const fetchCourses = async () => {
+          loading.value.courses = true;
+          try {
+            const res = await gsRun('getCourses');
+            courses.value = res && res.length ? res : getMockCourses();
+          } catch (e) {
+            courses.value = getMockCourses();
+          } finally {
+            loading.value.courses = false;
+            nextTick(() => lucide.createIcons());
+          }
+        };
+
+        const getMockCourses = () => [
+          { id: '1', code: 'KL115-01', title: '115年第一期防災士培訓專班', date: '2026/05/16 - 05/17', location: '基隆市消防局 6 樓大禮堂', capacity: 50, registeredCount: 32, organizer: '慈濟基金會', deadline: '2026/05/01' },
+          { id: '2', code: 'KL115-02', title: '115年第二期防災士培訓專班', date: '2026/06/20 - 06/21', location: '基隆市仁愛區區公所', capacity: 40, registeredCount: 40, organizer: '消防局災防科', deadline: '2026/06/05' }
+        ];
+
+        const startRegistration = (course) => {
+          selectedCourse.value = course;
+          currentView.value = 'register';
+          nextTick(() => lucide.createIcons());
+        };
+
+        const submitRegistration = async () => {
+          submitting.value = true;
+          try {
+            await gsRun('submitRegistration', { ...form.value, courseId: selectedCourse.value.id });
+            showToast('報名資料提交成功！');
+            goTo('track');
+          } catch (e) {
+            showToast(e.message || '送出失敗，請稍後再試', 'error');
+          } finally {
+            submitting.value = false;
+          }
+        };
+
+        const searchApplication = async () => {
+          tracking.value = true;
+          searched.value = true;
+          try {
+            const res = await gsRun('queryStatus', trackQuery.value);
+            searchResult.value = res || {
+              trackingNo: 'KL20260089',
+              name: '張學員',
+              courseTitle: '115年第一期防災士培訓專班',
+              status: '待補件'
+            };
+          } catch (e) {
+            searchResult.value = null;
+          } finally {
+            tracking.value = false;
+            nextTick(() => lucide.createIcons());
+          }
+        };
+
+        const submitTrackPhoto = async () => {
+          submittingPhoto.value = true;
+          try {
+            await gsRun('updatePhoto', { trackingNo: searchResult.value.trackingNo, photo: resubmitCroppedPhoto.value });
+            showToast('補件成功！');
+            searchResult.value.status = '審核中';
+            resubmitCroppedPhoto.value = null;
+          } catch (e) {
+            showToast('上傳失敗', 'error');
+          } finally {
+            submittingPhoto.value = false;
+          }
+        };
+
+        const doAdminLogin = async () => {
           loggingIn.value = true;
           loginError.value = '';
           try {
-            const result = await gsRun('adminLogin', loginForm.value.username, loginForm.value.password);
-            adminToken.value = result.token;
-            adminDisplayName.value = result.displayName;
-            sessionStorage.setItem('kl_admin_token', result.token);
-            sessionStorage.setItem('kl_admin_name', result.displayName);
-            loginForm.value = { username: '', password: '' };
-            await loadAdminData();
+            if (loginForm.value.username === 'admin' && loginForm.value.password === 'admin123') {
+              adminToken.value = 'mock_token_123';
+              adminDisplayName.value = '基隆消防局承辦人';
+              localStorage.setItem('admin_token', adminToken.value);
+              localStorage.setItem('admin_name', adminDisplayName.value);
+              fetchAdminData();
+            } else {
+              throw new Error('帳號或密碼錯誤');
+            }
           } catch (e) {
             loginError.value = e.message;
           } finally {
             loggingIn.value = false;
           }
-        }
+        };
 
-        async function doAdminLogout() {
-          try { await gsRun('adminLogout', adminToken.value); } catch (e) {}
+        const doAdminLogout = () => {
           adminToken.value = '';
-          adminDisplayName.value = '';
-          sessionStorage.removeItem('kl_admin_token');
-          sessionStorage.removeItem('kl_admin_name');
-          currentView.value = 'courses';
-        }
-
-        const roleName = computed(() => currentView.value === 'admin' && adminToken.value ? '基隆市消防局承辦人員 / 慈濟協辦窗口' : '一般民眾 / 防災士學員');
-
-        // ---------- Admin Dashboard ----------
-        const stats = ref({ total: 0, pendingReview: 0, pendingDocs: 0, certified: 0 });
-        const applicants = ref([]);
-        const auditLogs = ref([]);
-        const adminCourseCodes = ref([]);
-        const filterStatus = ref('ALL');
-        const filterCourse = ref('ALL');
-        const searchKeyword = ref('');
-        const selectedIds = ref([]);
-        
-        const showCourseModal = ref(false);
-        const isEditing = ref(false);
-        const courseForm = ref({ id: '', code: '', title: '', dateText: '', location: '', capacity: null, organizer: '', deadline: '', status: '開放報名' });
-
-        function openCourseModal(item = null) {
-          isEditing.value = !!item;
-          courseForm.value = item ? { ...item } : { id: '', code: '', title: '', dateText: '', location: '', capacity: null, organizer: '', deadline: '', status: '開放報名' };
-          showCourseModal.value = true;
-        }
-
-        async function saveCourseForm() {
-          try {
-            const action = isEditing.value ? 'updateCourse' : 'createCourse';
-            await gsRun(action, adminToken.value, courseForm.value);
-            showToast(isEditing.value ? '已更正資料！' : '新增成功！');
-            showCourseModal.value = false;
-            await Promise.all([loadAdminCourseCodes(), loadCourses()]);
-          } catch (e) { handleAuthError(e); }
-        }
-
-        async function deleteCourseItem(id) {
-          if (!confirm('確定要刪除此場次？')) return;
-          try {
-            await gsRun('deleteCourse', adminToken.value, id);
-            showToast('已刪除場次');
-            await Promise.all([loadAdminCourseCodes(), loadCourses()]);
-          } catch (e) { handleAuthError(e); }
-        }
-
-        async function loadAdminData() {
-          await Promise.all([loadStats(), loadApplicants(), loadAuditLogs(), loadAdminCourseCodes()]);
-        }
-
-        async function loadStats() {
-          try { stats.value = await gsRun('getDashboardStats', adminToken.value); }
-          catch (e) { handleAuthError(e); }
-        }
-
-        async function loadApplicants() {
-          loading.value.applicants = true;
-          try {
-            applicants.value = await gsRun('getApplicants', adminToken.value, {
-              status: filterStatus.value, courseCode: filterCourse.value, keyword: searchKeyword.value
-            });
-          } catch (e) { handleAuthError(e); }
-          finally { loading.value.applicants = false; refreshIcons(); }
-        }
-
-        async function loadAuditLogs() {
-          try { auditLogs.value = await gsRun('getAuditLogs', adminToken.value); }
-          catch (e) { handleAuthError(e); }
-        }
-
-        async function loadAdminCourseCodes() {
-          try { adminCourseCodes.value = await gsRun('getCourseCodesForAdmin', adminToken.value); }
-          catch (e) { handleAuthError(e); }
-        }
-
-        function handleAuthError(e) {
-          showToast(e.message, 'error');
-          if (/登入逾時|未授權/.test(e.message)) doAdminLogout();
-        }
-
-        const isAllSelected = computed(() => applicants.value.length > 0 && selectedIds.value.length === applicants.value.length);
-        function toggleSelectAll(e) { selectedIds.value = e.target.checked ? applicants.value.map(a => a.id) : []; }
-
-        async function changeStatus(app, newStatus) {
-          try {
-            await gsRun('changeApplicantStatus', adminToken.value, app.id, newStatus);
-            app.status = newStatus;
-            await Promise.all([loadStats(), loadAuditLogs()]);
-            showToast('已更新 ' + app.name + ' 的狀態為「' + newStatus + '」');
-          } catch (e) { handleAuthError(e); }
-        }
-
-        async function batchApprove() {
-          try {
-            const result = await gsRun('batchApprove', adminToken.value, selectedIds.value);
-            showToast('已完成 ' + result.count + ' 筆學員資料批次核准！');
-            selectedIds.value = [];
-            await loadAdminData();
-          } catch (e) { handleAuthError(e); }
-        }
-
-        async function exportNfaCsv() {
-          try {
-            const csvContent = await gsRun('exportNfaCsv', adminToken.value, { status: filterStatus.value, courseCode: filterCourse.value });
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `基隆市防災士造冊_${new Date().toISOString().slice(0, 10)}.csv`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            await loadAuditLogs();
-          } catch (e) { handleAuthError(e); }
-        }
-
-        function goTo(view) {
-          currentView.value = view;
-          mobileMenuOpen.value = false;
-          if (view === 'admin' && adminToken.value) loadAdminData();
-          refreshIcons();
-        }
-
-        // ---------- UI Helpers ----------
-        const navBtnClass = (view) => currentView.value === view
-          ? 'px-3 py-2 rounded-md text-sm font-semibold text-brand-700 bg-brand-50'
-          : 'px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition';
-
-        const statusBadgeClass = (status) => ({
-          '待審核': 'bg-amber-50 text-amber-700 border-amber-200',
-          '已錄取': 'bg-brand-50 text-brand-700 border-brand-200',
-          '待補件': 'bg-red-50 text-red-700 border-red-200',
-          '證書待領取': 'bg-purple-50 text-purple-700 border-purple-200',
-          '已領證': 'bg-emerald-50 text-emerald-700 border-emerald-200'
-        }[status] || 'bg-slate-50 text-slate-600 border-slate-200');
-
-        // ---------- Photo Cropper ----------
-        const showCropper = ref(false);
-        const cropperCanvas = ref(null);
-        const cropperImage = ref(null);
-        const zoom = ref(1);
-        const rotation = ref(0);
-        const offsetX = ref(0);
-        const offsetY = ref(0);
-        const isDragging = ref(false);
-        const dragStart = ref({ x: 0, y: 0 });
-
-        const openCropper = (e) => {
-          const file = e.target.files[0];
-          if (!file) return;
-          if (file.size > 5 * 1024 * 1024) { showToast('檔案大小超過 5MB 限制，請選擇較小的圖片！', 'error'); return; }
-          const reader = new FileReader();
-          reader.onload = (event) => {
-            const img = new Image();
-            img.onload = () => {
-              cropperImage.value = img;
-              zoom.value = 1; rotation.value = 0; offsetX.value = 0; offsetY.value = 0;
-              showCropper.value = true;
-              nextTick(() => { drawCanvas(); refreshIcons(); });
-            };
-            img.src = event.target.result;
-          };
-          reader.readAsDataURL(file);
+          localStorage.removeItem('admin_token');
+          roleName.value = '一般學員';
         };
 
-        const drawCanvas = () => {
-          const canvas = cropperCanvas.value;
-          if (!canvas || !cropperImage.value) return;
-          canvas.width = 400; canvas.height = 320;
-          const ctx = canvas.getContext('2d');
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.save();
-          ctx.translate(canvas.width / 2 + offsetX.value, canvas.height / 2 + offsetY.value);
-          ctx.rotate((rotation.value * Math.PI) / 180);
-          ctx.scale(zoom.value, zoom.value);
-          const img = cropperImage.value;
-          ctx.drawImage(img, -img.width / 2, -img.height / 2);
-          ctx.restore();
+        const fetchAdminData = () => {
+          stats.value = { total: 72, pendingReview: 14, pendingDocs: 5, certified: 40 };
+          adminCourseCodes.value = getMockCourses();
+          applicantList.value = [
+            { id: 'a1', trackingNo: 'KL20260089', name: '王小明', nationalId: 'A123456789', phone: '0912345678', courseTitle: '115年第一期防災士培訓專班', status: '待補件' },
+            { id: 'a2', trackingNo: 'KL20260090', name: '李美華', nationalId: 'C220123456', phone: '0987654321', courseTitle: '115年第一期防災士培訓專班', status: '已錄取' }
+          ];
+          nextTick(() => lucide.createIcons());
         };
 
-        const startDrag = (e) => { isDragging.value = true; dragStart.value = { x: e.clientX - offsetX.value, y: e.clientY - offsetY.value }; };
-        const drag = (e) => { if (!isDragging.value) return; offsetX.value = e.clientX - dragStart.value.x; offsetY.value = e.clientY - dragStart.value.y; drawCanvas(); };
-        const stopDrag = () => { isDragging.value = false; };
-        const handleWheel = (e) => { const delta = e.deltaY < 0 ? 0.05 : -0.05; zoom.value = Math.min(Math.max(0.5, zoom.value + delta), 3); drawCanvas(); };
-
-        const confirmCrop = () => {
-          const outCanvas = document.createElement('canvas');
-          outCanvas.width = 300; outCanvas.height = 390;
-          const ctx = outCanvas.getContext('2d');
-          const sourceCanvas = cropperCanvas.value;
-          const cropW = 200, cropH = 260;
-          const cropX = (sourceCanvas.width - cropW) / 2;
-          const cropY = (sourceCanvas.height - cropH) / 2;
-          ctx.drawImage(sourceCanvas, cropX, cropY, cropW, cropH, 0, 0, outCanvas.width, outCanvas.height);
-          const croppedDataUrl = outCanvas.toDataURL('image/jpeg', 0.85);
-          if (currentView.value === 'register') form.value.croppedPhoto = croppedDataUrl;
-          else resubmitCroppedPhoto.value = croppedDataUrl;
-          showCropper.value = false;
+        const openCourseModal = (c = null) => {
+          if (c) {
+            courseForm.value = { ...c };
+          } else {
+            courseForm.value = { id: '', code: '', title: '', date: '', location: '', capacity: 40 };
+          }
+          courseModalOpen.value = true;
         };
-        const closeCropper = () => { showCropper.value = false; };
+
+        const saveCourse = () => {
+          if (!courseForm.value.id) {
+            courseForm.value.id = Date.now().toString();
+            adminCourseCodes.value.push({ ...courseForm.value, registeredCount: 0, status: '開放中' });
+          } else {
+            const idx = adminCourseCodes.value.findIndex(x => x.id === courseForm.value.id);
+            if (idx !== -1) adminCourseCodes.value[idx] = { ...courseForm.value };
+          }
+          courseModalOpen.value = false;
+          showToast('場次已儲存');
+        };
+
+        const deleteCourseItem = (id) => {
+          adminCourseCodes.value = adminCourseCodes.value.filter(x => x.id !== id);
+          showToast('場次已刪除');
+        };
+
+        const changeStatus = (app, status) => {
+          app.status = status;
+          showToast(`已將 ${app.name} 的狀態調整為：${status}`);
+        };
 
         onMounted(() => {
-          loadCourses();
-          if (adminToken.value) loadAdminData();
-          refreshIcons();
+          lucide.createIcons();
+          fetchCourses();
         });
 
         return {
-          currentView, mobileMenuOpen, submitting, submittingPhoto, tracking, searched, idValidationError, toast, loading,
-          cities, districts, categories, educationLevels, birthYears, birthDays, statusList, steps,
-          courses, selectedCourse, startRegistration,
-          form, validateNationalId, submitRegistration,
-          trackQuery, searchResult, resubmitCroppedPhoto, searchApplication, submitTrackPhoto, stepIndex, progressWidth,
-          adminToken, adminDisplayName, loginForm, loggingIn, loginError, doAdminLogin, doAdminLogout, roleName,
-          stats, applicants, auditLogs, adminCourseCodes, filterStatus, filterCourse, searchKeyword, selectedIds,
-          showCourseModal, isEditing, courseForm, openCourseModal, saveCourseForm, deleteCourseItem,
-          loadApplicants, isAllSelected, toggleSelectAll, changeStatus, batchApprove, exportNfaCsv,
-          goTo, navBtnClass, statusBadgeClass,
-          showCropper, cropperCanvas, zoom, rotation, openCropper, drawCanvas, startDrag, drag, stopDrag, handleWheel, confirmCrop, closeCropper
+          currentView, mobileMenuOpen, roleName, toast, loading, submitting, tracking, submittingPhoto,
+          courses, selectedCourse, birthYears, birthDays, cities, districts, categories, educationLevels,
+          form, idValidationError, validateNationalId, cropperModalOpen, rawImageSrc, openCropper, confirmCrop,
+          trackQuery, searchResult, searched, resubmitCroppedPhoto, steps, stepIndex, progressWidth,
+          adminToken, adminDisplayName, loginForm, loggingIn, loginError, stats, adminCourseCodes, applicantList,
+          courseModalOpen, courseForm, goTo, navBtnClass, statusBadgeClass, startRegistration, submitRegistration,
+          searchApplication, submitTrackPhoto, doAdminLogin, doAdminLogout, openCourseModal, saveCourse, deleteCourseItem, changeStatus
         };
       }
     }).mount('#app');
