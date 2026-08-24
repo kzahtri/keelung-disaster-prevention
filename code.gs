@@ -1,3 +1,25 @@
+/** External Google Apps Script Web App URL */
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7k3DQmliGW-Ai-kXIUw_-c4dkLLQwTDkvccyBWnIP4djdMuP9Ssakn3L4GAfAkW0K/exec";
+
+    /** Async Promise Wrapper using fetch API */
+    async function gsRun(fnName, ...args) {
+      try {
+        const response = await fetch(GAS_WEB_APP_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: fnName, args: args })
+        });
+        
+        const data = await response.json();
+        if (data.status === 'error' || data.error) {
+          throw new Error(data.error || 'Server error');
+        }
+        return data.result !== undefined ? data.result : data;
+      } catch (err) {
+        throw new Error(err.message || '無法連線至 Google Apps Script 後端');
+      }
+    }
+
 /**
  * 基隆市防災士培訓報名平台 - 後端核心服務 (Google Apps Script)
  * 符合公共程式 (Public Code) 標準，資料與程式碼完全分離
