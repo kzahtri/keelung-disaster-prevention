@@ -22,6 +22,27 @@
   </script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  /** External Google Apps Script Web App URL */
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7k3DQmliGW-Ai-kXIUw_-c4dkLLQwTDkvccyBWnIP4djdMuP9Ssakn3L4GAfAkW0K/exec";
+
+    /** Async Promise Wrapper using fetch API */
+    async function gsRun(fnName, ...args) {
+      try {
+        const response = await fetch(GAS_WEB_APP_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: fnName, args: args })
+        });
+        
+        const data = await response.json();
+        if (data.status === 'error' || data.error) {
+          throw new Error(data.error || 'Server error');
+        }
+        return data.result !== undefined ? data.result : data;
+      } catch (err) {
+        throw new Error(err.message || '無法連線至 Google Apps Script 後端');
+      }
+    }
   <style>
     [v-cloak] { display: none !important; }
     .glass-effect { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); }
